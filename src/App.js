@@ -1,9 +1,8 @@
 import React, {Component} from 'react'
-import { StyleSheet,Text, Dimensions, View, Animated, Button, ScrollView} from 'react-native'
-import Svg, {Circle} from 'react-native-svg'
+import {StyleSheet, Easing, Text, Dimensions, View, Animated, Button, ScrollView} from 'react-native'
+import Svg, {Circle, Line} from 'react-native-svg'
 import Pendulum from './Pendulum'
-
-const {height, width} = Dimensions.get('window')
+const {width} = Dimensions.get('window')
 
 class ButtonsBoard extends Component {
   constructor (props) {
@@ -50,18 +49,39 @@ class SvgCirclesBoard extends Component {
 class SvgAnimation extends Component {
   constructor (props) {
     super(props)
-    this.state = {}
+    this.swingPendulum = this.swingPendulum.bind(this)
+    this.swingValue = new Animated.Value(0.5)
+  }
+
+  swingPendulum () {
+    Animated.sequence([
+      Animated.timing(this.swingValue, { toValue: 1, duration: 1500, easing: Easing.linear() }),
+      Animated.timing(this.swingValue, { toValue: 0, duration: 1500, easing: Easing.linear() })
+    ]).start(() => { this.swingPendulum() })
   }
   render () {
+    const spin = this.swingValue.interpolate({inputRange: [0, 0.5, 1], outputRange: ['130deg', '175deg', '220deg']})
     return (
       <View>
-        <Pendulum />
+        <Svg width={width} height={3}>
+          <Line x1={0} y1={0} x2={width} y2={0} stroke='#1D7098' strokeWidth='6' />
+        </Svg>
+        <Animated.View style={{
+          position: 'relative',
+          bottom: 100,
+          width: width,
+          height: width,
+          transform: [{rotate: spin}]
+        }}>
+          <Pendulum />
+        </Animated.View>
+        <Button title='swing!' onPress={this.swingPendulum} />
       </View>
     )
   }
 }
 
-export default class MyCom extends Component {
+export default class App extends Component {
   constructor (props) {
     super(props)
     this.state = {c1: 'red', c2: 'red', c3: 'red', c4: 'red'}
@@ -70,16 +90,12 @@ export default class MyCom extends Component {
   render () {
     return (
       <ScrollView>
-{/*
-        <Text style={styles.headerText}>Button press events</Text>
-        <ButtonsBoard />
-
-        <Text style={styles.headerText}>SVG press events</Text>
-        <SvgCirclesBoard /> */}
-
         <Text style={styles.headerText}>SVG Animaiton</Text>
         <SvgAnimation />
-
+        <Text style={styles.headerText}>SVG press events</Text>
+        <SvgCirclesBoard />
+        <Text style={styles.headerText}>Button press events</Text>
+        <ButtonsBoard />
       </ScrollView>
     )
   }

@@ -1,12 +1,12 @@
 import React from 'react'
 import {View} from 'react-native'
-import MyCom from './MyCom'
+import App from './App'
 
 export default class SvgTest extends React.Component {
   render () {
     return (
       <View>
-        <MyCom />
+        <App />
       </View>
     )
   }
